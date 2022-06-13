@@ -1,0 +1,2 @@
+yarn run start
+ngrok http 3000
