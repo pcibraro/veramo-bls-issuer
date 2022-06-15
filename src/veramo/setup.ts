@@ -102,7 +102,7 @@ export const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IResol
       suites: [
         new VeramoEcdsaSecp256k1RecoverySignature2020(), 
         new VeramoEd25519Signature2018(),
-        new VeramoBbsBlsSignatureProof2020(new PrivateKeyStore(dbConnection, new SecretBox(KMS_SECRET_KEY)))],
+        new VeramoBbsBlsSignatureProof2020()],
     }),
     new CredentialIssuer(),
     new DataStore(dbConnection),
