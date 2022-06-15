@@ -16,6 +16,7 @@
     "@veramo/did-resolver": "^3.1.5-next.126",
     "@veramo/key-manager": "^3.1.5-next.126",
     "@veramo/kms-local": "^3.1.5-next.126",
+    "base58-js": "^1.0.2",
     "sqlite3": "^5.0.8",
     "web-did-resolver": "^2.0.18"
   },

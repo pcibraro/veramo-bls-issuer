@@ -1,10 +1,12 @@
-import { AbstractKeyManagementSystem, AbstractPrivateKeyStore } from '@veramo/key-manager'
+import { AbstractKeyManagementSystem, AbstractPrivateKeyStore, ManagedPrivateKey } from '@veramo/key-manager'
 import { KeyManagementSystem } from '@veramo/kms-local'
 import { TKeyType, IKey, ManagedKeyInfo, MinimalImportableKey, RequireOnly } from '@veramo/core'
 
 import { Bls12381G2KeyPair } from '@mattrglobal/bls12381-key-pair';
 
 import * as u8a from 'uint8arrays'
+
+const { binary_to_base58 } = require('base58-js')
 
 export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
     private readonly keyStore: AbstractPrivateKeyStore
@@ -56,7 +58,7 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
                 type,
                 privateKeyHex: u8a.toString(keyPair.privateKeyBuffer, 'base16'),
                 publicKeyHex: u8a.toString(keyPair.publicKeyBuffer, 'base16')
-                
+
             })
             return key;
         } else {
@@ -66,24 +68,41 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
 
     async listKeys(): Promise<ManagedKeyInfo[]> {
         const privateKeys = await this.keyStore.list({})
-        
+
         const managedKeys = privateKeys.filter((key) => key.type == "Bls12381G2")
             .map((key) => this.asManagedKeyInfo(key));
-        
+
         return managedKeys
     }
 
-    async sign({
-        keyRef,
-        algorithm,
-        data,
-    }: {
+    async sign(args: {
         keyRef: Pick<IKey, 'kid'>
         algorithm?: string
         data: Uint8Array
-    }): Promise<string> {
+        [x: string]: any
+      }): Promise<string> {
 
-        throw Error("not supported");
+        let managedKey: ManagedPrivateKey
+        try {
+            managedKey = await this.keyStore.get({ alias: args.keyRef.kid })
+        } catch (e) {
+            throw new Error(`key_not_found: No key entry found for kid=${args.keyRef.kid}`)
+        }
+
+        const binaryData = args.binaryData;
+            
+        const publicKey = u8a.fromString(args.keyRef.kid, 'base16'); 
+        const privateKey = managedKey.privateKeyHex ? u8a.fromString(managedKey.privateKeyHex, 'base16') : undefined;      
+
+        const k = new Bls12381G2KeyPair({
+            id: '',
+            publicKeyBase58: binary_to_base58(publicKey),
+            privateKeyBase58: binary_to_base58(privateKey),
+        });
+
+        const signedData = await k.signer().sign({ data: binaryData });
+
+        return u8a.toString(signedData, 'base64');
     }
 
     async sharedSecret(args: {
@@ -92,7 +111,7 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
     }): Promise<string> {
         throw Error("not supported");
     }
-    
+
     /**
   * Converts a {@link ManagedPrivateKey} to {@link ManagedKeyInfo}
   */
@@ -104,7 +123,7 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
             publicKeyHex: args.publicKeyHex,
             meta: {
                 verificationMethod: {
-                  type: "BbsBlsSignatureProof2020"
+                    type: "BbsBlsSignatureProof2020"
                 }
             }
         }

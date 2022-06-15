@@ -5,7 +5,7 @@ async function main() {
   const identity = await agent.didManagerCreate(
     {
       provider: 'did:web',
-      alias: 'e554-181-31-123-153.ngrok.io',
+      alias: 'd933-181-31-123-153.ngrok.io',
       options: {
         keyType: 'Bls12381G2',
         meta: {

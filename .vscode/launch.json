@@ -1,0 +1,72 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "create identifier",
+        "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+        ],
+        "runtimeExecutable": "node",
+        "args": [
+          "--inspect",
+          "${workspaceFolder}/src/create-identifier.ts"
+        ],
+        "cwd": "${workspaceRoot}",
+        "skipFiles": [
+          "<node_internals>/**",
+          "node_modules/**"
+        ],
+        "env": {
+          "TS_NODE_FILES": "1"
+        }
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "issue vc",
+        "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+        ],
+        "runtimeExecutable": "node",
+        "args": [
+          "--inspect",
+          "${workspaceFolder}/src/issue-vc.ts"
+        ],
+        "cwd": "${workspaceRoot}",
+        "skipFiles": [
+          "<node_internals>/**",
+          "node_modules/**"
+        ],
+        "env": {
+          "TS_NODE_FILES": "1"
+        }
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "list identifiers",
+        "runtimeArgs": [
+          "-r",
+          "ts-node/register"
+        ],
+        "runtimeExecutable": "node",
+        "args": [
+          "--inspect",
+          "${workspaceFolder}/src/list-identifiers.ts"
+        ],
+        "cwd": "${workspaceRoot}",
+        "skipFiles": [
+          "<node_internals>/**",
+          "node_modules/**"
+        ],
+        "env": {
+          "TS_NODE_FILES": "1"
+        }
+      }
+    ]
+  }
+  

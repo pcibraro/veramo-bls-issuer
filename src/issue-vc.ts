@@ -5,8 +5,8 @@ async function main() {
     const expirationDate = new Date();
     expirationDate.setFullYear(expirationDate.getFullYear() + 3);
 
-    const did = 'did:web:e554-181-31-123-153.ngrok.io';
-    const key = '874b969345bce1a080582b92bfdd14930017b8ece4484974573d71307908a4c9a926ef16245411ea28277ca9e1c37b2108769a09e59d8df33517cefa722091fe2d5389b272c74a9f475ca31d7462d9ba59414a58aa7ffbaa5189f41b868d694c';
+    const did = 'did:web:d933-181-31-123-153.ngrok.io';
+    const key = 'ae29846d958baf8b6d9cc2aff91f08741a6b4116a4f6b0802b28c1d2f2d1152fdd1dbaea754895f28af3f4cbb69cde2417541e678e39f8a4681f57a95863caea4dcd61dacba8dac7b0e5562a0123d0070d7b39baeb4cc698079ecefeb7509ea8';
 
     const vc = await agent.createVerifiableCredential({
         credential: { 
