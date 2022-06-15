@@ -19,9 +19,6 @@ import { sign } from 'crypto'
 
 export class VeramoBbsBlsSignatureProof2020 extends VeramoLdSignature {
 
-    //TODO: this is a bit hacky. The context should provide a way to get the private key. 
-    //We can not delegate that to the kms set in the context as it is being done with the other suites as 
-    // the BLS suite does not support that.
     constructor() {
         super();
     }
@@ -35,13 +32,9 @@ export class VeramoBbsBlsSignatureProof2020 extends VeramoLdSignature {
 
     getSuiteForSigning(key: IKey, issuerDid: string, verificationMethodId: string, context: IAgentContext<RequiredAgentMethods>) {
 
-        //TODO: We should ideally use the context here to get the private key but this method is sync
-        //context does not provide a way to get a private key
-
         const publicKey = u8a.fromString(key.publicKeyHex, 'base16');
 
         const signer = {
-            // returns a JWS detached
             sign: async (args: { data: any }): Promise<Uint8Array> => {
                 
                 const signature = await context.agent.keyManagerSign({
