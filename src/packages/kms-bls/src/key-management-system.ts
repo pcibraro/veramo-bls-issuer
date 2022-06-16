@@ -10,13 +10,11 @@ const { binary_to_base58 } = require('base58-js')
 
 export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
     private readonly keyStore: AbstractPrivateKeyStore
-    private readonly innerKeyManagementSystem: KeyManagementSystem;
 
     constructor(keyStore: AbstractPrivateKeyStore) {
         super();
 
         this.keyStore = keyStore;
-        this.innerKeyManagementSystem = new KeyManagementSystem(keyStore);
     }
 
     async importKey(args: Omit<MinimalImportableKey, 'kms'>): Promise<ManagedKeyInfo> {
@@ -36,12 +34,12 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
             return managedKey
         }
         else {
-            throw Error('key type not supported');
+            throw Error('not_supported: key type not supported');
         }
     }
 
     async deleteKey(args: { kid: string }) {
-        return this.innerKeyManagementSystem.deleteKey(args);
+        return await this.keyStore.delete({ alias: args.kid })
     }
 
     async createKey({ type }: { type: TKeyType }): Promise<ManagedKeyInfo> {
@@ -62,7 +60,7 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
             })
             return key;
         } else {
-            return this.innerKeyManagementSystem.createKey({ type });
+            throw Error('not_supported: key type not supported');
         }
     }
 
@@ -72,7 +70,7 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
         const managedKeys = privateKeys.filter((key) => key.type == "Bls12381G2")
             .map((key) => this.asManagedKeyInfo(key));
 
-        return managedKeys
+        return managedKeys;
     }
 
     async sign(args: {
@@ -88,11 +86,23 @@ export class BlsKeyManagementSystem extends AbstractKeyManagementSystem {
         } catch (e) {
             throw new Error(`key_not_found: No key entry found for kid=${args.keyRef.kid}`)
         }
+        
+        if(!args.binaryData) {
+            throw new Error(`invalid_args: binaryData argument is null`);
+        }
+
+        if(!managedKey.privateKeyHex) {
+            throw new Error(`invalid_private_key: no private key for kid=${args.keyRef.kid}`);
+        }
+
+        if(managedKey.type != 'Bls12381G2') {
+            throw Error('not_supported: key type not supported');
+        }
 
         const binaryData = args.binaryData;
             
         const publicKey = u8a.fromString(args.keyRef.kid, 'base16'); 
-        const privateKey = managedKey.privateKeyHex ? u8a.fromString(managedKey.privateKeyHex, 'base16') : undefined;      
+        const privateKey = u8a.fromString(managedKey.privateKeyHex, 'base16');      
 
         const k = new Bls12381G2KeyPair({
             id: '',

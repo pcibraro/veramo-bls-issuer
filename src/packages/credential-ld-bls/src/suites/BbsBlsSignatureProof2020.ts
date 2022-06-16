@@ -40,9 +40,9 @@ export class VeramoBbsBlsSignatureProof2020 extends VeramoLdSignature {
                 const signature = await context.agent.keyManagerSign({
                     keyRef: key.kid,
                     algorithm: '',
-                    data: '',
+                    data: '', // Why do we need to encode the data as an string ??
                     encoding: 'utf-8',
-                    binaryData: args.data
+                    binaryData: args.data // Workaround: Added a new property for passing the data without encoding
                 })
 
                 return u8a.fromString(signature, 'base64')
